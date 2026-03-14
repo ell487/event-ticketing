@@ -5,7 +5,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    return view('welcome');
+});
 
 // 1. Route Dashboard Utama
 Route::get('/dashboard', [DashboardController::class, 'index'])
