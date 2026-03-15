@@ -12,5 +12,12 @@ class TicketType extends Model
         'price',
         'quota',
         'sold_quantity',
+
     ];
+
+    // Relasi: "Satu jenis tiket ini milik satu Event tertentu"
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
+    }
 }

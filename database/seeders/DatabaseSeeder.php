@@ -3,23 +3,41 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. BUAT DUMMY KATEGORI
+        DB::table('categories')->insert([
+            ['category_name' => 'Konser Musik', 'description' => 'Acara konser musik live'],
+            ['category_name' => 'Standup Comedy', 'description' => 'Acara komedi tunggal'],
+            ['category_name' => 'Workshop & Seminar', 'description' => 'Acara edukasi dan pelatihan'],
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // 2. BUAT DUMMY USERS (Admin, Organizer, User)
+        User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin@festix.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        User::create([
+            'name' => 'Organizer ',
+            'email' => 'organizer@festix.com',
+            'password' => Hash::make('password'),
+            'role' => 'organizer',
+        ]);
+
+        User::create([
+            'name' => 'Yanto',
+            'email' => 'user@festix.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
         ]);
     }
 }

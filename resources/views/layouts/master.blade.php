@@ -16,16 +16,18 @@
         </div>
 
         <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
-            <a href="/dashboard" class="block px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-semibold shadow-md">
-                📊 Dashboard
+            <a href="/dashboard" class="block px-4 py-2.5 rounded-lg {{ request()->is('dashboard') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                 Dashboard
             </a>
 
             @if(Auth::user()->role === 'admin' || Auth::user()->role === 'organizer')
-            <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
+
+            <a href="{{ route('events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
                 Kelola Event
             </a>
+
             <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                Kelola Tiket
+                Laporan Transaksi
             </a>
             @endif
 
@@ -34,7 +36,7 @@
                 Tiket Saya
             </a>
             <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                 Cari Event
+                Cari Event
             </a>
             @endif
         </nav>

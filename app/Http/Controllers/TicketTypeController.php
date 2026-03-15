@@ -2,63 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TicketType;
 use Illuminate\Http\Request;
 
 class TicketTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Simpan tiket baru ke event tertentu
+    public function store(Request $request, $eventId)
     {
-        //
+        // Validasi inputan admin
+        $request->validate([
+            'type_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'quota' => 'required|integer|min:1',
+        ]);
+
+        // Simpan ke database
+        TicketType::create([
+            'event_id' => $eventId,
+            'type_name' => $request->type_name,
+            'price' => $request->price,
+            'quota' => $request->quota,
+            'sold_quantity' => 0, // Awal dibuat pasti belum ada yang laku
+        ]);
+
+        // Kembalikan ke halaman yang sama dengan pesan sukses
+        return back()->with('success', 'Berhasil menambahkan jenis tiket baru!');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Hapus tiket
+    public function destroy($id)
     {
-        //
-    }
+        $ticket = TicketType::findOrFail($id);
+        $ticket->delete();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return back()->with('success', 'Jenis tiket berhasil dihapus!');
     }
 }

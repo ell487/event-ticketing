@@ -16,19 +16,25 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 // 2. Group Route KHUSUS ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    // Nanti route khusus admin taruh di sini (misal: acc organizer, lihat semua transaksi)
+    Route::resource('events', EventController::class);
 });
 
 // 3. Group Route KHUSUS ORGANIZER
 Route::middleware(['auth', 'role:organizer'])->group(function () {
-    // Route untuk manajemen Event (CRUD Event hanya bisa dilakukan Organizer)
-    Route::resource('events', EventController::class);
+    // Nanti fitur Dashboard Analitik & Export Excel ditaruh di sini
 });
 
 // 4. Group Route KHUSUS USER BIASA
 Route::middleware(['auth', 'role:user'])->group(function () {
     // Nanti route beli tiket dan lihat e-ticket taruh di sini
 });
+
+// 5.Rute untuk melihat Detail Event (tempat admin nambahin tiket)
+Route::get('/events/{id}/show', [App\Http\Controllers\EventController::class, 'show'])->name('events.show');
+
+// Rute untuk menyimpan & menghapus Jenis Tiket
+Route::post('/events/{id}/tickets', [App\Http\Controllers\TicketTypeController::class, 'store'])->name('tickets.store');
+Route::delete('/tickets/{id}', [App\Http\Controllers\TicketTypeController::class, 'destroy'])->name('tickets.destroy');
 
 // Route Profile (
 Route::middleware('auth')->group(function () {

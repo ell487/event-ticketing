@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mb-8">
-        <h3 class="text-3xl font-bold text-white">👋 Welcome, {{ Auth::user()->name }}!</h3>
+        <h3 class="text-3xl font-bold text-white"> Welcome, {{ Auth::user()->name }}!</h3>
         <p class="text-slate-400 mt-1">Siap untuk seru-seruan? Yuk cari event favoritmu.</p>
     </div>
 
