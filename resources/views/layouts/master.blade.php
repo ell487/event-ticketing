@@ -31,11 +31,11 @@
             </a>
             @endif
 
-            @if(Auth::user()->role === 'user')
-            <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
+           @if(Auth::user()->role === 'user')
+            <a href="{{ route('user.tickets.index') }}" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
                 Tiket Saya
             </a>
-            <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
+            <a href="{{ route('user.events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('user.events.index') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
                 Cari Event
             </a>
             @endif

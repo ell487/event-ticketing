@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->string('invoice_code')->unique();
             $table->dateTime('expiration_date')->nullable();
-            $table->enum('transaction_status,',['pending','paid','failed'])->default('pending');
+            $table->enum('transaction_status', ['pending','paid','failed'])->default('pending');
             $table->timestamps();
         });
     }

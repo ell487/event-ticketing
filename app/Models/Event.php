@@ -32,4 +32,11 @@ class Event extends Model
     {
         return $this->hasMany(TicketType::class, 'event_id');
     }
+
+    // Relasi: "Satu Event memiliki Satu Kategori"
+    public function category()
+    {
+
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 }

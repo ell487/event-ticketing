@@ -12,4 +12,10 @@ class Ticket extends Model
         'qr_code_path',
         'used_at',
     ];
+
+    // Relasi balik ke detail transaksi
+    public function transactionDetail()
+    {
+        return $this->belongsTo(TransactionDetail::class, 'transaction_detail_id');
+    }
 }
