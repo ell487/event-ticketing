@@ -18,15 +18,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
             <p class="text-slate-400 text-sm font-semibold mb-2">Total Seluruh Event</p>
-            <h4 class="text-4xl font-bold text-indigo-400">45</h4>
+            <h4 class="text-4xl font-bold text-blue-400">{{ $totalEvents }}</h4>
         </div>
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
             <p class="text-slate-400 text-sm font-semibold mb-2">Total Organizer</p>
-            <h4 class="text-4xl font-bold text-green-400">12</h4>
+            <h4 class="text-4xl font-bold text-green-400">{{ $totalOrganizers }}</h4>
         </div>
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
             <p class="text-slate-400 text-sm font-semibold mb-2">Total Pendapatan Sistem</p>
-            <h4 class="text-4xl font-bold text-yellow-400">Rp 120M</h4>
+            <h4 class="text-4xl font-bold text-yellow-400">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h4>
         </div>
     </div>
 @endsection

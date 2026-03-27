@@ -14,9 +14,7 @@
                 Lihat Event
             </button>
         </div>
-        <div class="hidden md:block text-6xl">
-            🎸
-        </div>
+        
     </div>
 
     <h4 class="text-xl font-bold text-white mb-4">Tiket Aktif Saya</h4>

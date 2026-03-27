@@ -47,7 +47,7 @@
         @empty
 
         <div class="col-span-full bg-slate-800/50 border border-slate-700 border-dashed rounded-2xl p-12 text-center">
-            <h3 class="text-xl font-bold text-slate-300 mb-2">Yah, belum ada event nih 😢</h3>
+            <h3 class="text-xl font-bold text-slate-300 mb-2">Yah, belum ada event nih </h3>
             <p class="text-slate-500">Tunggu admin nambahin event baru ya!</p>
         </div>
 

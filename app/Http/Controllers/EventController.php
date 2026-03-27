@@ -23,16 +23,16 @@ class EventController extends Controller
 
 
     // 2. Menampilkan Form Tambah Event
-    public function create()
+   public function create()
     {
-      // Ambil data kategori dari database
-        $categories = DB::table('categories')->get();
+        // 1. Ambil semua data kategori dari database
+        $categories = \App\Models\Category::all();
 
-        // Ambil hanya user yang punya role 'organizer'
-        $organizers = User::where('role', 'organizer')->get();
 
-        // Kirim datanya ke view
-        return view('pages.admin.events.create', compact('categories', 'organizers'));
+        $organizers = \App\Models\User::where('role', 'organizer')->get();
+
+        // 2. Kirim $categories ke tampilan form
+        return view('pages.admin.events.create', compact('categories','organizers'));
     }
 
     // 3. Menampilkan Form Edit (Update - Bagian 1)

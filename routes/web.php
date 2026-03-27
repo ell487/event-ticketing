@@ -17,6 +17,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // 2. Group Route KHUSUS ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('events', EventController::class);
+    // Rute CRUD Kategori Dinamis
+    Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class)->except(['create', 'show', 'edit']);
 });
 
 // 3. Group Route KHUSUS ORGANIZER

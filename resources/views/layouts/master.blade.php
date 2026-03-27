@@ -15,23 +15,33 @@
             </h1>
         </div>
 
-        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+       <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-2">
             <a href="/dashboard" class="block px-4 py-2.5 rounded-lg {{ request()->is('dashboard') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
                  Dashboard
             </a>
 
-            @if(Auth::user()->role === 'admin' || Auth::user()->role === 'organizer')
-
+            @if(Auth::user()->role === 'admin')
+            <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
+                Kelola Kategori
+            </a>
             <a href="{{ route('events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
                 Kelola Event
             </a>
-
             <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
                 Laporan Transaksi
             </a>
             @endif
 
-           @if(Auth::user()->role === 'user')
+            @if(Auth::user()->role === 'organizer')
+            <a href="{{ route('events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                Event Saya
+            </a>
+            <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
+                Laporan Penjualan
+            </a>
+            @endif
+
+            @if(Auth::user()->role === 'user')
             <a href="{{ route('user.tickets.index') }}" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
                 Tiket Saya
             </a>
