@@ -11,15 +11,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
             <p class="text-slate-400 text-sm font-semibold mb-2">Event Aktif Saya</p>
-            <h4 class="text-4xl font-bold text-blue-400">{{ $activeEvents }}</h4>
+            <h4 class="text-4xl font-bold text-blue-400">{{ $activeEvents ?? 0 }}</h4>
         </div>
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
             <p class="text-slate-400 text-sm font-semibold mb-2">Tiket Terjual</p>
-            <h4 class="text-4xl font-bold text-green-400">{{ $ticketsSold }}</h4>
+            <h4 class="text-4xl font-bold text-green-400">{{ $ticketsSold ?? 0 }}</h4>
         </div>
         <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
             <p class="text-slate-400 text-sm font-semibold mb-2">Pendapatan Saya</p>
-            <h4 class="text-4xl font-bold text-green-400">{{ $ticketsSold }}</h4>
+            <h4 class="text-4xl font-bold text-amber-400">Rp {{ number_format($revenue ?? 0, 0, ',', '.') }}</h4>
         </div>
     </div>
 
@@ -40,7 +40,6 @@
                             <th class="px-6 py-4 font-semibold text-center w-16">No</th>
                             <th class="px-6 py-4 font-semibold">Pembeli</th>
                             <th class="px-6 py-4 font-semibold">Event</th>
-                            <th class="px-6 py-4 font-semibold">Bukti Transfer</th>
                             <th class="px-6 py-4 font-semibold text-center">Status</th>
                             <th class="px-6 py-4 font-semibold text-center w-32">Aksi</th>
                         </tr>
@@ -51,25 +50,17 @@
                             <td class="px-6 py-4 text-center">{{ $index + 1 }}</td>
                             <td class="px-6 py-4 font-medium text-white">{{ $transaction->user->name }}</td>
                             <td class="px-6 py-4 text-sm text-slate-400">{{ $transaction->event->title }}</td>
-                            <td class="px-6 py-4">
-                                @if($transaction->proof_of_payment)
-                                    <a href="{{ asset('storage/' . $transaction->proof_of_payment) }}" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline text-sm flex items-center gap-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                                        Lihat Bukti
-                                    </a>
-                                @else
-                                    <span class="text-slate-500 text-sm italic">Belum upload</span>
-                                @endif
-                            </td>
+
                             <td class="px-6 py-4 text-center">
                                 @if($transaction->transaction_status == 'pending')
-                                    <span class="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs font-semibold border border-amber-500/30">Pending</span>
+                                    <span class="px-3 py-1 bg-amber-500/20 text-amber-400 rounded-full text-xs font-semibold border border-amber-500/30">Menunggu ACC</span>
                                 @elseif($transaction->transaction_status == 'paid')
                                     <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-semibold border border-emerald-500/30">Lunas</span>
                                 @else
-                                    <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold border border-red-500/30">Gagal</span>
+                                    <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-semibold border border-red-500/30">Gagal / Ditolak</span>
                                 @endif
                             </td>
+
                             <td class="px-6 py-4 flex justify-center gap-2">
                                 @if($transaction->transaction_status == 'pending')
                                     <form action="{{ route('organizer.transactions.approve', $transaction->id) }}" method="POST">
@@ -93,7 +84,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-500">Belum ada transaksi tiket masuk untuk event kamu.</td>
+                            <td colspan="5" class="px-6 py-12 text-center text-slate-500">Belum ada transaksi tiket masuk untuk event kamu.</td>
                         </tr>
                         @endforelse
                     </tbody>

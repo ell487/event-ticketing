@@ -20,7 +20,7 @@
                         <th class="px-6 py-4 font-semibold">Event</th>
                         <th class="px-6 py-4 font-semibold">Batas Waktu</th>
                         <th class="px-6 py-4 font-semibold">Status</th>
-                        <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                        <th class="px-6 py-4 font-semibold">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-700">
@@ -31,6 +31,7 @@
                         <td class="px-6 py-4 text-sm text-slate-400">
                             {{ \Carbon\Carbon::parse($trx->expiration_date)->format('d M Y, H:i') }}
                         </td>
+
                         <td class="px-6 py-4">
                             @if($trx->transaction_status === 'pending')
                                 <span class="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/30">PENDING</span>
@@ -40,11 +41,17 @@
                                 <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold border border-red-500/30">FAILED</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-right">
+
+                        <td class="px-6 py-4">
                             @if($trx->transaction_status === 'pending')
-                                <a href="{{ route('payment.show', $trx->invoice_code) }}" class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-md">
-                                    Bayar Sekarang
-                                </a>
+                                <div class="flex flex-col items-start gap-1">
+                                    <a href="{{ route('payment.show', $trx->invoice_code) }}" class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-md">
+                                        Bayar Sekarang
+                                    </a>
+                                    <span class="text-amber-500/80 text-[11px] font-medium italic mt-1">
+                                        *Tunggu ACC jika sudah transfer
+                                    </span>
+                                </div>
                             @elseif($trx->transaction_status === 'paid')
                                 <a href="{{ route('user.tickets.show', $trx->invoice_code) }}" class="inline-block bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition border border-slate-600">
                                     Lihat E-Ticket

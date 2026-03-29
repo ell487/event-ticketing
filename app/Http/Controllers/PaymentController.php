@@ -17,7 +17,7 @@ class PaymentController extends Controller
     {
         $transaction = Transaction::with(['event', 'details.ticket'])
                         ->where('invoice_code', $invoice_code)
-                    
+
                         ->firstOrFail();
 
 
@@ -40,54 +40,20 @@ class PaymentController extends Controller
         return view('pages.user.payment.show', compact('transaction'));
     }
 
-    public function process(Request $request, $invoice_code)
+   public function process(Request $request, $invoice_code)
     {
         $transaction = Transaction::with('details.ticket')->where('invoice_code', $invoice_code)->firstOrFail();
 
-        if ($transaction->transaction_status !== 'pending') {
-            return back()->with('error', 'Transaksi ini sudah tidak valid.');
-        }
-
+        
         DB::beginTransaction();
         try {
-            // A. UBAH STATUS TRANSAKSI
-            $transaction->update(['transaction_status' => 'paid']);
-
-            // B. POTONG KUOTA & CETAK TIKET
-            foreach ($transaction->details as $detail) {
-                // 1. Kurangi kuota (tambah sold_quantity)
-                $ticketType = TicketType::find($detail->ticket_type_id);
-                $ticketType->increment('sold_quantity', $detail->quantity);
-
-                // 2. Cetak E-Ticket sebanyak jumlah yang dibeli (quantity)
-                for ($i = 0; $i < $detail->quantity; $i++) {
-                    // Bikin kode unik (Contoh: TIX-A1B2C3D4)
-                    $ticketCode = 'TIX-' . strtoupper(Str::random(8));
-
-                    // nama file QR Code
-                    $qrCodeFileName = 'qrcodes/' . $ticketCode . '.svg';
-
-                    // Generate gambar QR Code
-                    $qrCodeContent = QrCode::size(300)->generate($ticketCode);
-
-                    // Simpan gambar QR ke folder storage/app/public/qrcodes
-                    Storage::disk('public')->put($qrCodeFileName, $qrCodeContent);
-
-                    // Simpan ke database tabel 'tickets'
-                    Ticket::create([
-                        'transaction_detail_id' => $detail->id,
-                        'ticket_code' => $ticketCode,
-                        'qr_code_path' => $qrCodeFileName,
-                    ]);
-                }
-            }
-
             DB::commit();
-            return redirect()->route('user.tickets.index')->with('success', 'Pembayaran Berhasil! E-Ticket kamu sudah terbit.');
+            return redirect()->route('user.tickets.index')->with('success', 'Konfirmasi pembayaran berhasil dikirim! Silakan tunggu Organizer melakukan ACC.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Pembayaran gagal: ' . $e->getMessage());
+            return back()->with('error', 'Konfirmasi gagal: ' . $e->getMessage());
         }
+
     }
 }

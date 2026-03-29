@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Storage;
 use App\Models\Event;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+
+
 class EventController extends Controller
 {
 
@@ -147,10 +150,38 @@ class EventController extends Controller
             'status' => 'published',
         ]);
 
-
-
-
-
         return redirect()->route('events.index')->with('success', 'Event berhasil ditambahkan!');
     }
+
+    //Organizer event saya
+   public function monitor($id)
+    {
+        $event = Event::with('ticketTypes')->findOrFail($id);
+
+
+    // 1. Ambil semua transaksi yang PAID untuk event
+    $transactions = Transaction::where('event_id', $id)
+                        ->where('transaction_status', 'paid')
+                        ->with(['user', 'details.ticket']) // Load relasi detail dan tipe tiket
+                        ->latest()
+                        ->get();
+
+    // 2. Hitung total tiket terjual 
+    $ticketsSold = 0;
+    $revenue = 0;
+
+    foreach ($transactions as $trx) {
+        foreach ($trx->details as $detail) {
+            $ticketsSold += $detail->quantity;
+            $revenue += ($detail->quantity * ($detail->ticket->price ?? 0));
+        }
+    }
+
+    // 3. Hitung Total Kuota Gabungan (Reguler + VIP)
+    $totalQuota = $event->ticketTypes->sum('quota');
+
+    return view('pages.organizer.events.monitor', compact(
+        'event', 'transactions', 'ticketsSold', 'revenue', 'totalQuota'
+    ));
+}
 }

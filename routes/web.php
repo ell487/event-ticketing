@@ -23,7 +23,18 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 // 3. Group Route KHUSUS ORGANIZER
 Route::middleware(['auth', 'role:organizer'])->group(function () {
-    // Nanti fitur Dashboard Analitik & Export Excel ditaruh di sini
+
+    Route::get('/organizer/events', [App\Http\Controllers\DashboardController::class, 'myEvents'])
+        ->name('organizer.events.index');
+
+    Route::get('/organizer/events/{id}/monitor', [App\Http\Controllers\EventController::class, 'monitor'])
+        ->name('organizer.events.monitor');
+
+    Route::patch('/organizer/transactions/{id}/approve', [App\Http\Controllers\DashboardController::class, 'approveTransaction'])
+        ->name('organizer.transactions.approve');
+
+    Route::patch('/organizer/transactions/{id}/reject', [App\Http\Controllers\DashboardController::class, 'rejectTransaction'])
+        ->name('organizer.transactions.reject');
 });
 
 // 4. Group Route KHUSUS USER BIASA

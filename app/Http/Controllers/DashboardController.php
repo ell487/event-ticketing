@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TicketType;
+use App\Models\Ticket;
+ use Illuminate\Support\Str;
+ use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Event;
@@ -77,5 +83,80 @@ class DashboardController extends Controller
             // DATA UNTUK DASHBOARD USER
             return view('pages.user.dashboard');
         }
+    }
+    // Fungsi khusus untuk Organizer melihat daftar event
+    public function myEvents()
+    {
+        $user = Auth::user();
+
+        // Ambil event yang cuma milik organizer yang lagi login
+        $events = Event::where('organizer_id', $user->id)->latest()->get();
+
+        // Arahkan ke file view khusus organizer yang tadi baru dibikin
+        return view('pages.organizer.events.index', compact('events'));
+    }
+
+    // FUNGSI ACC PEMBAYARAN ORGANIZER
+   public function approveTransaction($id)
+    {
+        $transaction = Transaction::with('details')->findOrFail($id);
+
+        if ($transaction->event->organizer_id !== Auth::id()) {
+            abort(403, 'Anda tidak berhak mengubah transaksi ini.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Ubah status jadi Lunas ('paid')
+            $transaction->update(['transaction_status' => 'paid']);
+
+            // 2. POTONG KUOTA & CETAK TIKET (Pindahan dari PaymentController)
+            foreach ($transaction->details as $detail) {
+                // Kurangi kuota
+                $ticketType = TicketType::find($detail->ticket_type_id);
+                $ticketType->increment('sold_quantity', $detail->quantity);
+
+                // Cetak E-Ticket
+                for ($i = 0; $i < $detail->quantity; $i++) {
+                    $ticketCode = 'TIX-' . strtoupper(Str::random(8));
+                    $qrCodeFileName = 'qrcodes/' . $ticketCode . '.svg';
+                    $qrCodeContent = QrCode::size(300)->generate($ticketCode);
+                    Storage::disk('public')->put($qrCodeFileName, $qrCodeContent);
+
+                    Ticket::create([
+                        'transaction_detail_id' => $detail->id,
+                        'ticket_code' => $ticketCode,
+                        'qr_code_path' => $qrCodeFileName,
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Pembayaran di-ACC! E-Ticket untuk pembeli telah diterbitkan.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memproses tiket: ' . $e->getMessage());
+        }
+    }
+
+    // FUNGSI TOLAK PEMBAYARAN
+    public function rejectTransaction($id)
+    {
+        // 1. Cari transaksi berdasarkan ID
+        $transaction = Transaction::findOrFail($id);
+
+        // 2. Keamanan
+        if ($transaction->event->organizer_id !== Auth::id()) {
+            abort(403, 'Anda tidak berhak mengubah transaksi ini.');
+        }
+
+        // 3. Ubah status jadi Gagal/Ditolak
+        $transaction->update([
+            'transaction_status' => 'failed'
+        ]);
+
+        // 4. Balik ke halaman sebelumnya bawa pesan sukses
+        return redirect()->back()->with('success', 'Pembayaran telah ditolak.');
     }
 }

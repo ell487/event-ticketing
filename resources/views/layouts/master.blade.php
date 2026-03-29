@@ -33,7 +33,7 @@
             @endif
 
             @if(Auth::user()->role === 'organizer')
-            <a href="{{ route('events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+            <a href="{{ route('organizer.events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
                 Event Saya
             </a>
             <a href="#" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
