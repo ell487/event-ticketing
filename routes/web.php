@@ -17,8 +17,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // 2. Group Route KHUSUS ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('events', EventController::class);
-    // Rute CRUD Kategori Dinamis
+    // Rute CRUD Kategori 
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class)->except(['create', 'show', 'edit']);
+    Route::get('/admin/transactions', [App\Http\Controllers\ReportController::class, 'adminIndex'])->name('admin.reports.index');
 });
 
 // 3. Group Route KHUSUS ORGANIZER
@@ -35,6 +36,15 @@ Route::middleware(['auth', 'role:organizer'])->group(function () {
 
     Route::patch('/organizer/transactions/{id}/reject', [App\Http\Controllers\DashboardController::class, 'rejectTransaction'])
         ->name('organizer.transactions.reject');
+
+    Route::post('/organizer/checkin/{transaction_id}', [EventController::class, 'checkIn'])
+        ->name('organizer.checkin');
+
+    Route::get('/organizer/reports', [App\Http\Controllers\ReportController::class, 'index'])
+        ->name('organizer.reports');
+
+    Route::get('/organizer/reports/pdf', [App\Http\Controllers\ReportController::class, 'exportPdf'])
+    ->name('organizer.reports.pdf');
 });
 
 // 4. Group Route KHUSUS USER BIASA

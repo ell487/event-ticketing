@@ -11,7 +11,8 @@ class Transaction extends Model
         'event_id',
         'invoice_code',
         'expiration_date',
-        'transaction_status'
+        'transaction_status',
+        'is_checked_in'
     ];
 
     // Relasi balik ke User dan Event

@@ -140,8 +140,8 @@ class EventController extends Controller
 
         // Simpan ke Database (SEKARANG TANPA HARDCODE!)
         Event::create([
-            'organizer_id' => $request->organizer_id, // Mengambil pilihan dari form
-            'category_id' => $request->category_id,   // Mengambil pilihan dari form
+            'organizer_id' => $request->organizer_id,
+            'category_id' => $request->category_id,
             'title' => $request->title,
             'description' => $request->description,
             'banner_path' => $bannerPath,
@@ -162,11 +162,11 @@ class EventController extends Controller
     // 1. Ambil semua transaksi yang PAID untuk event
     $transactions = Transaction::where('event_id', $id)
                         ->where('transaction_status', 'paid')
-                        ->with(['user', 'details.ticket']) // Load relasi detail dan tipe tiket
+                        ->with(['user', 'details.ticket'])
                         ->latest()
                         ->get();
 
-    // 2. Hitung total tiket terjual 
+    // 2. Hitung total tiket terjual
     $ticketsSold = 0;
     $revenue = 0;
 
@@ -182,6 +182,24 @@ class EventController extends Controller
 
     return view('pages.organizer.events.monitor', compact(
         'event', 'transactions', 'ticketsSold', 'revenue', 'totalQuota'
-    ));
-}
+        ));
+    }
+
+    public function checkIn($id) {
+        $transaction = Transaction::findOrFail($id);
+        if($transaction->transaction_status == 'paid') {
+
+
+            if($transaction->is_checked_in) {
+                return back()->with('error', 'Gagal! Tiket ini sudah pernah di-scan dan digunakan.');
+            }
+
+        
+            $transaction->update(['is_checked_in' => true]);
+
+            return back()->with('success', 'Check-in berhasil! Selamat datang ' . $transaction->user->name);
+        }
+
+        return back()->with('error', 'Gagal! Status tiket belum lunas.');
+    }
 }

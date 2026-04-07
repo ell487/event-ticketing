@@ -29,12 +29,12 @@ class PaymentController extends Controller
             }
 
             // Tendang user balik ke halaman tiket bawa pesan error
-            return redirect()->route('user.tickets.index')->with('error', 'Yahh, batas waktu pembayaran untuk tiket ini sudah habis 😭');
+            return redirect()->route('user.tickets.index')->with('error', 'Yahh, batas waktu pembayaran untuk tiket ini sudah habis ');
         }
 
 
         if ($transaction->transaction_status === 'paid') {
-            return redirect()->route('user.tickets.index')->with('success', 'Tiket ini sudah lunas kok!');
+            return redirect()->route('user.tickets.index')->with('success', 'Tiket ini sudah lunas kok');
         }
 
         return view('pages.user.payment.show', compact('transaction'));
@@ -44,7 +44,7 @@ class PaymentController extends Controller
     {
         $transaction = Transaction::with('details.ticket')->where('invoice_code', $invoice_code)->firstOrFail();
 
-        
+
         DB::beginTransaction();
         try {
             DB::commit();

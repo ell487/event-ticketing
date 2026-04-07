@@ -4,7 +4,7 @@
 <div class="max-w-4xl mx-auto">
     <div class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-            <h3 class="text-3xl font-bold text-white">✨ Buat Event Baru</h3>
+            <h3 class="text-3xl font-bold text-white"> Buat Event Baru</h3>
             <p class="text-slate-400 mt-1">Lengkapi detail event yang akan kamu selenggarakan.</p>
         </div>
 

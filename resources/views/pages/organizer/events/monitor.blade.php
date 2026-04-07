@@ -28,7 +28,7 @@
         </div>
         <div class="bg-slate-800 rounded-2xl border border-slate-700 p-6 shadow-lg">
             <h3 class="text-slate-400 text-sm font-semibold uppercase">Pendapatan Sementara</h3>
-            <p class="text-3xl font-black text-white mt-2">
+            <p class="text-3xl font-black text-indigo-400 mt-2">
                 Rp {{ number_format($revenue, 0, ',', '.') }}
             </p>
         </div>
@@ -46,7 +46,7 @@
                         <th class="px-6 py-4 font-semibold">Invoice & Jenis Tiket</th>
                         <th class="px-6 py-4 font-semibold">Waktu Beli</th>
                         <th class="px-6 py-4 font-semibold">Status Tiket</th>
-                        <th class="px-6 py-4 font-semibold text-center">Aksi (Validasi)</th>
+                        <th class="px-6 py-4 font-semibold text-center">Aksi </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-700">
@@ -80,9 +80,16 @@
                         </td>
 
                         <td class="px-6 py-4 text-center">
-                            <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition shadow-md">
-                                Scan QR & Check-in
-                            </button>
+                           @if($trx->is_checked_in)
+                                <span class="px-3 py-1 text-sm text-green-700 bg-green-100 rounded-full">Sudah Hadir</span>
+                            @else
+                                <form action="{{ route('organizer.checkin', $trx->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+                                        Scan QR & Check-in
+                                    </button>
+                                </form>
+                            @endif
                         </td>
                     </tr>
                     @empty

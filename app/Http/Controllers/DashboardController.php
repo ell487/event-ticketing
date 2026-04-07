@@ -21,66 +21,79 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-
-            // DATA UNTUK DASHBOARD ADMIN
-
-            // 1. Hitung total semua event di sistem
+            // --- DATA DASHBOARD ADMIN ---
             $totalEvents = Event::count();
-
-            // 2. Hitung total user yang role-nya organizer
             $totalOrganizers = User::where('role', 'organizer')->count();
 
-            // 3. Hitung total pendapatan seluruh sistem
-            $successfulTransactions = Transaction::with(['details.ticket'])
-                                        ->where('transaction_status', 'paid')
-                                        ->get();
+            // Hitung total revenue sistem
+            // --- DATA DASHBOARD ADMIN ---
+$totalEvents = Event::count();
+$totalOrganizers = User::where('role', 'organizer')->count();
 
-            $totalRevenue = 0;
-            foreach ($successfulTransactions as $transaction) {
-                foreach ($transaction->details as $detail) {
-                    // Tambahkan pendapatan: quantity x harga tiket
-                    $totalRevenue += ($detail->quantity * ($detail->ticket->price ?? 0));
-                }
-            }
+$totalRevenue = Transaction::where('transaction_status', 'paid')
+    ->with('details.ticket')
+    ->get()
+    ->sum(function($trx) {
+        return $trx->details->sum(function($detail) {
 
-            // Kirim data ke tampilan Admin
+            return $detail->quantity * ($detail->ticket->price ?? 0);
+        });
+    });
+
             return view('pages.admin.dashboard', compact('totalEvents', 'totalOrganizers', 'totalRevenue'));
 
-        } elseif ($user->role === 'organizer') {
 
-            // DATA UNTUK DASHBOARD ORGANIZER
+        } elseif ($user->role === 'organizer') {
+            // --- DATA DASHBOARD ORGANIZER ---
             $eventIds = Event::where('organizer_id', $user->id)->pluck('id');
             $activeEvents = $eventIds->count();
 
-            $successfulTransactions = Transaction::with(['details.ticket'])
-                                        ->whereIn('event_id', $eventIds)
+            // Hitung Tiket Terjual & Revenue milik Organizer ini
+            $successfulTransactions = Transaction::whereIn('event_id', $eventIds)
+                                                ->where('transaction_status', 'paid');
+
+            $ticketsSold = Transaction::whereIn('event_id', $eventIds)
                                         ->where('transaction_status', 'paid')
-                                        ->get();
+                                        ->with('details')
+                                        ->get()
+                                        ->sum(fn($trx) => $trx->details->sum('quantity'));
 
-            $ticketsSold = 0;
-            $revenue = 0;
 
-            foreach ($successfulTransactions as $transaction) {
-                foreach ($transaction->details as $detail) {
-                    $ticketsSold += $detail->quantity;
-                    $revenue += ($detail->quantity * ($detail->ticket->price ?? 0));
-                }
-            }
+            $revenue = Transaction::whereIn('event_id', $eventIds)
+            ->where('transaction_status', 'paid')
+            ->with('details.ticket')
+            ->get()
+            ->sum(function($trx) {
+                return $trx->details->sum(function($detail) {
+                    // Kita ambil harga dari relasi ticket yang ada di detail
+                    return $detail->quantity * ($detail->ticket->price ?? 0);
+                });
+            });
 
+            // Data buat tabel Approval
             $transactions = Transaction::with(['user', 'event'])
-                                       ->whereIn('event_id', $eventIds)
-                                       ->latest()
-                                       ->get();
+                                    ->whereIn('event_id', $eventIds)
+                                    ->latest()
+                                    ->get();
+
+            //  DATA GRAFIK (7 Hari Terakhir)
+            $salesData = Transaction::whereIn('event_id', $eventIds)
+                ->where('transaction_status', 'paid')
+                ->selectRaw('DATE(updated_at) as date, COUNT(*) as total')
+                ->groupBy('date')
+                ->orderBy('date', 'asc')
+                ->take(7)
+                ->get();
+
+            $chartLabels = $salesData->pluck('date');
+            $chartValues = $salesData->pluck('total');
 
             return view('pages.organizer.dashboard', compact(
-                'activeEvents',
-                'ticketsSold',
-                'revenue',
-                'transactions'
+                'activeEvents', 'ticketsSold', 'revenue', 'transactions',
+                'chartLabels', 'chartValues' // Kirim data grafik ke blade
             ));
 
         } else {
-            // DATA UNTUK DASHBOARD USER
             return view('pages.user.dashboard');
         }
     }
@@ -158,5 +171,15 @@ class DashboardController extends Controller
 
         // 4. Balik ke halaman sebelumnya bawa pesan sukses
         return redirect()->back()->with('success', 'Pembayaran telah ditolak.');
+    }
+
+    public function exportReport($event_id)
+    {
+        $event = Event::with(['transactions' => function($q) {
+            $q->where('transaction_status', 'paid');
+        }, 'transactions.user', 'transactions.details.ticket'])->findOrFail($event_id);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.organizer.report_pdf', compact('event'));
+        return $pdf->download('Laporan-Penjualan-'.$event->title.'.pdf');
     }
 }

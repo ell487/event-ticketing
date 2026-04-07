@@ -23,6 +23,21 @@
         </div>
     </div>
 
+
+    <div class="mt-8 bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-lg">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-xl font-bold text-white">Analitik Penjualan</h3>
+                <p class="text-slate-400 text-sm">Tren transaksi lunas dalam 7 hari terakhir.</p>
+            </div>
+            
+        </div>
+
+        <div class="h-[350px] w-full">
+            <canvas id="organizerSalesChart"></canvas>
+        </div>
+    </div>
+
     <div class="mt-10">
         <h3 class="text-xl font-bold text-white mb-4">Persetujuan Tiket & Pembayaran</h3>
 
@@ -93,3 +108,74 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.getElementById('organizerSalesChart');
+        if (!canvas) {
+            console.error("Canvas element tidak ditemukan!");
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+
+        // Ambil data dari PHP, kalau error/kosong kasih array kosong
+        let labels = {!! json_encode($chartLabels ?? []) !!};
+        let dataValues = {!! json_encode($chartValues ?? []) !!};
+
+        // Jika belum ada data transaksi sama sekali, tampilkan grafik dummy 0
+        if (labels.length === 0) {
+            labels = ['H-6', 'H-5', 'H-4', 'H-3', 'H-2', 'H-1', 'Hari Ini'];
+            dataValues = [0, 0, 0, 0, 0, 0, 0];
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tiket Terjual',
+                    data: dataValues,
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            stepSize: 1, // Pastikan angkanya bulat (1, 2, 3 tiket)
+                            precision: 0
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush
