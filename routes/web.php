@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TicketValidationController; 
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,7 +18,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // 2. Group Route KHUSUS ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('events', EventController::class);
-    // Rute CRUD Kategori 
+    // Rute CRUD Kategori
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class)->except(['create', 'show', 'edit']);
     Route::get('/admin/transactions', [App\Http\Controllers\ReportController::class, 'adminIndex'])->name('admin.reports.index');
 });
@@ -45,6 +46,9 @@ Route::middleware(['auth', 'role:organizer'])->group(function () {
 
     Route::get('/organizer/reports/pdf', [App\Http\Controllers\ReportController::class, 'exportPdf'])
     ->name('organizer.reports.pdf');
+
+    Route::post('/validate-ticket/{id}', [TicketValidationController::class, 'validateTicket'])
+        ->name('tickets.validate');
 });
 
 // 4. Group Route KHUSUS USER BIASA

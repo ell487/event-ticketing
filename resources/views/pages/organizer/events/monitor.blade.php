@@ -51,47 +51,53 @@
                 </thead>
                 <tbody class="divide-y divide-slate-700">
                     @forelse($transactions as $trx)
-                    <tr class="hover:bg-slate-700/50 transition">
-                        <td class="px-6 py-4 font-medium text-white">{{ $trx->user->name ?? 'Guest' }}</td>
+                        @foreach($trx->details as $detail)
+                            @foreach($detail->tickets as $ticket)
+                            <tr class="hover:bg-slate-700/50 transition">
+                                <td class="px-6 py-4 font-medium text-white">{{ $trx->user->name ?? 'Guest' }}</td>
 
-                     <td class="px-6 py-4">
-                            <div class="font-mono text-indigo-400 text-sm mb-1">{{ $trx->invoice_code }}</div>
-
-                            <div class="flex flex-wrap gap-1">
-                                @foreach ($trx->details as $detail)
-                                    {{-- Cek VIP: pake ? (if) dan : (else) biar kodenya tipis --}}
-                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded border uppercase tracking-tighter
-                                        {{ Str::contains(strtolower($detail->ticket->type_name), 'vip')
-                                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                        : 'bg-blue-500/10 text-blue-500 border-blue-500/20' }}">
-                                        {{ $detail->quantity }}x {{ $detail->ticket->type_name }}
+                                <td class="px-6 py-4">
+                                    <div class="font-mono text-indigo-400 text-sm mb-1">{{ $trx->invoice_code }}</div>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-tighter bg-blue-500/10 text-blue-500 border-blue-500/20">
+                                        {{ $detail->ticket->type_name }}
                                     </span>
-                                @endforeach
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-slate-400">
-                            {{ \Carbon\Carbon::parse($trx->updated_at)->format('d M Y, H:i') }}
-                        </td>
+                                    <div class="text-[10px] text-slate-500 mt-1 font-mono">{{ $ticket->ticket_code }}</div>
+                                </td>
 
-                        <td class="px-6 py-4">
-                            <span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30">
-                                Aktif
-                            </span>
-                        </td>
+                                <td class="px-6 py-4 text-sm text-slate-400">
+                                    {{ \Carbon\Carbon::parse($trx->updated_at)->format('d M Y, H:i') }}
+                                </td>
 
-                        <td class="px-6 py-4 text-center">
-                           @if($trx->is_checked_in)
-                                <span class="px-3 py-1 text-sm text-green-700 bg-green-100 rounded-full">Sudah Hadir</span>
-                            @else
-                                <form action="{{ route('organizer.checkin', $trx->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
-                                        Scan QR & Check-in
-                                    </button>
-                                </form>
-                            @endif
-                        </td>
-                    </tr>
+                                <td class="px-6 py-4">
+                                    @if($ticket->used_at)
+                                        <span class="bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs font-bold border border-red-500/30">
+                                            Terpakai
+                                        </span>
+                                    @else
+                                        <span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30">
+                                            Aktif
+                                        </span>
+                                    @endif
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    @if($ticket->used_at)
+                                        {{-- Di sini perbaikan Carbon parse-nya biar nggak error --}}
+                                        <span class="text-slate-500 text-sm italic">
+                                            Terpakai pada {{ \Carbon\Carbon::parse($ticket->used_at)->format('H:i') }}
+                                        </span>
+                                    @else
+                                        <form action="{{ route('tickets.validate', $ticket->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 text-xs font-bold transition">
+                                                Generate E-Ticket
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        @endforeach
                     @empty
                     <tr>
                         <td colspan="5" class="px-6 py-12 text-center text-slate-500 italic">
