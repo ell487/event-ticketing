@@ -41,7 +41,7 @@ class EventController extends Controller
     // 3. Menampilkan Form Edit (Update - Bagian 1)
     public function edit($id)
     {
-        $event = Event::findOrFail($id); // Cari event berdasarkan ID
+        $event = Event::findOrFail($id); 
         $categories = DB::table('categories')->get();
         $organizers = User::where('role', 'organizer')->get();
 
@@ -194,7 +194,7 @@ class EventController extends Controller
                 return back()->with('error', 'Gagal! Tiket ini sudah pernah di-scan dan digunakan.');
             }
 
-        
+
             $transaction->update(['is_checked_in' => true]);
 
             return back()->with('success', 'Check-in berhasil! Selamat datang ' . $transaction->user->name);

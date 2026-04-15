@@ -36,7 +36,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <div class="bg-slate-800 rounded-xl border border-slate-700 p-6 shadow-lg lg:col-span-1 h-fit">
-            <h5 class="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">➕ Tambah Tiket Baru</h5>
+            <h5 class="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2"> Tambah Tiket Baru</h5>
             <form action="{{ route('tickets.store', $event->id) }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
@@ -77,12 +77,16 @@
                             <td class="p-3 text-right text-emerald-400 font-semibold">Rp {{ number_format($ticket->price, 0, ',', '.') }}</td>
                             <td class="p-3 text-center">{{ $ticket->quota }}</td>
                             <td class="p-3 text-center">{{ $ticket->sold_quantity }}</td>
-                            <td class="p-3 text-center">
-                                <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST" onsubmit="return confirm('Hapus jenis tiket ini?');">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="text-red-400 hover:text-red-300 font-medium transition">Hapus</button>
-                                </form>
-                            </td>
+                           <td class="p-3 text-center flex justify-center items-center gap-3">
+                            <a href="{{ route('tickets.edit', $ticket->id) }}" class="text-indigo-400 hover:text-indigo-300 font-medium transition">
+                                Edit
+                            </a>
+                            <span class="text-slate-600">|</span>
+                            <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST" onsubmit="return confirm('Hapus jenis tiket ini?');" class="m-0">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-red-400 hover:text-red-300 font-medium transition">Hapus</button>
+                            </form>
+                        </td>
                         </tr>
                         @empty
                         <tr>

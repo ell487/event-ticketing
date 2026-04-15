@@ -46,6 +46,10 @@
             <a href="{{ route('organizer.events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
                 Event Saya
             </a>
+            <a href="{{ route('organizer.waiting-list') }}"
+            class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('organizer.waiting-list') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                Daftar Tunggu
+            </a>
             <a href="{{ route('organizer.reports') }}" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
                 Laporan Penjualan
             </a>

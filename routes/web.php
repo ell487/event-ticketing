@@ -6,6 +6,7 @@ use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketValidationController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\WaitingListController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +25,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/transactions', [App\Http\Controllers\ReportController::class, 'adminIndex'])->name('admin.reports.index');
     Route::get('/admin/organizers', [CategoryController::class, 'organizerIndex'])->name('admin.organizers.index');
     Route::post('/admin/organizers', [CategoryController::class, 'organizerStore'])->name('admin.organizers.store');
+    Route::get('/tickets/{id}/edit', [\App\Http\Controllers\TicketController::class, 'edit'])->name('tickets.edit');
+    Route::put('/tickets/{id}', [\App\Http\Controllers\TicketController::class, 'update'])->name('tickets.update');
 });
 
 // 3. Group Route KHUSUS ORGANIZER
@@ -52,6 +55,11 @@ Route::middleware(['auth', 'role:organizer'])->group(function () {
 
     Route::post('/validate-ticket/{id}', [TicketValidationController::class, 'validateTicket'])
         ->name('tickets.validate');
+
+    Route::get('/organizer/waiting-list', [WaitingListController::class, 'organizerIndex'])
+        ->name('organizer.waiting-list');
+    Route::post('/organizer/waiting-list/{id}/notify', [App\Http\Controllers\WaitingListController::class, 'notifyManual'])
+        ->name('organizer.waiting-list.notify');
 });
 
 // 4. Group Route KHUSUS USER BIASA
@@ -91,6 +99,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/payment/{invoice_code}', [App\Http\Controllers\PaymentController::class, 'show'])->name('payment.show');
     // Rute untuk memproses pembayarannya (Ubah status & potong kuota)
     Route::post('/payment/{invoice_code}', [App\Http\Controllers\PaymentController::class, 'process'])->name('payment.process');
+    Route::post('/waiting-list/{eventId}', [WaitingListController::class, 'store'])->name('waiting-list.store');
 });
 
 require __DIR__.'/auth.php';

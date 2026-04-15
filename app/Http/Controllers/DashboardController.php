@@ -15,6 +15,8 @@ use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TicketPaidMail;
+use App\Models\WaitingList;
+use App\Mail\TicketAvailableNotification;
 
 class DashboardController extends Controller
 {
@@ -29,18 +31,18 @@ class DashboardController extends Controller
 
             // Hitung total revenue sistem
             // --- DATA DASHBOARD ADMIN ---
-$totalEvents = Event::count();
-$totalOrganizers = User::where('role', 'organizer')->count();
+    $totalEvents = Event::count();
+    $totalOrganizers = User::where('role', 'organizer')->count();
 
-$totalRevenue = Transaction::where('transaction_status', 'paid')
-    ->with('details.ticket')
-    ->get()
-    ->sum(function($trx) {
-        return $trx->details->sum(function($detail) {
+    $totalRevenue = Transaction::where('transaction_status', 'paid')
+        ->with('details.ticket')
+        ->get()
+        ->sum(function($trx) {
+            return $trx->details->sum(function($detail) {
 
-            return $detail->quantity * ($detail->ticket->price ?? 0);
+                return $detail->quantity * ($detail->ticket->price ?? 0);
+            });
         });
-    });
 
             return view('pages.admin.dashboard', compact('totalEvents', 'totalOrganizers', 'totalRevenue'));
 
@@ -175,6 +177,29 @@ $totalRevenue = Transaction::where('transaction_status', 'paid')
 
         // 4. Balik ke halaman sebelumnya bawa pesan sukses
         return redirect()->back()->with('success', 'Pembayaran telah ditolak.');
+
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update(['transaction_status' => 'failed']);
+
+        // LOGIKA OTOMATISASI WAITING LIST
+        // 1. Ambil event ID dari transaksi yang ditolak
+        $eventId = $transaction->event_id; // Pastikan tabel transaksi punya event_id
+
+        // 2. Ambil orang pertama di antrean (Queue)
+        $nextInLine = WaitingList::where('event_id', $eventId)
+                        ->where('status', 'waiting')
+                        ->orderBy('created_at', 'asc')
+                        ->first();
+
+        if ($nextInLine) {
+            // 3. Kirim email ke dia
+            Mail::to($nextInLine->user->email)->send(new TicketAvailableNotification($nextInLine->user, $nextInLine->event));
+
+            // 4. Update status dia jadi 'notified' biar nggak dikirimin email terus
+            $nextInLine->update(['status' => 'notified']);
+        }
+
+    return back()->with('success', 'Transaksi ditolak & sistem sudah mengontak pengantre pertama.');
     }
 
     public function exportReport($event_id)
