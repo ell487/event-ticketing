@@ -21,15 +21,25 @@
             </a>
 
             @if(Auth::user()->role === 'admin')
-            <a href="{{ route('categories.index') }}" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                Kelola Kategori
-            </a>
-            <a href="{{ route('events.index') }}" class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
-                Kelola Event
-            </a>
-            <a href="{{ route('admin.reports.index') }}" class="block px-4 py-2.5 rounded-lg hover:bg-slate-700 text-slate-300 transition">
-                Laporan Transaksi
-            </a>
+                <a href="{{ route('categories.index') }}"
+                class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('categories.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                    Kelola Kategori
+                </a>
+
+                <a href="{{ route('events.index') }}"
+                class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('events.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                    Kelola Event
+                </a>
+
+                <a href="{{ route('admin.organizers.index') }}"
+                class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('admin.organizers.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                    Kelola Organizer
+                </a>
+
+                <a href="{{ route('admin.reports.index') }}"
+                class="block px-4 py-2.5 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-indigo-600 text-white font-semibold shadow-md' : 'hover:bg-slate-700 text-slate-300 transition' }}">
+                    Laporan Transaksi
+                </a>
             @endif
 
             @if(Auth::user()->role === 'organizer')

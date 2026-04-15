@@ -42,11 +42,32 @@ class PaymentController extends Controller
 
    public function process(Request $request, $invoice_code)
     {
-        $transaction = Transaction::with('details.ticket')->where('invoice_code', $invoice_code)->firstOrFail();
+        // 1. Validasi! Pastikan user beneran upload gambar dan ukurannya gak kegedean (Max 2MB)
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'payment_proof.required' => 'Bukti transfer wajib diupload ya.',
+            'payment_proof.image' => 'File harus berupa gambar.',
+            'payment_proof.max' => 'Ukuran gambar maksimal 2MB.'
+        ]);
 
+        $transaction = Transaction::with('details.ticket')->where('invoice_code', $invoice_code)->firstOrFail();
 
         DB::beginTransaction();
         try {
+            // 2. Logika Upload Gambar
+            $paymentProofPath = null;
+            if ($request->hasFile('payment_proof')) {
+                // Simpan ke storage/app/public/payment_proofs
+                $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+            }
+
+            // 3. Update data transaksi di database
+            $transaction->update([
+                'payment_proof' => $paymentProofPath,
+                'transaction_status' => 'pending', // Ubah status jadi pending biar nunggu di-ACC panitia
+            ]);
+
             DB::commit();
             return redirect()->route('user.tickets.index')->with('success', 'Konfirmasi pembayaran berhasil dikirim! Silakan tunggu Organizer melakukan ACC.');
 
@@ -54,6 +75,7 @@ class PaymentController extends Controller
             DB::rollBack();
             return back()->with('error', 'Konfirmasi gagal: ' . $e->getMessage());
         }
-
     }
+
+
 }

@@ -4,7 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TicketValidationController; 
+use App\Http\Controllers\TicketValidationController;
+use App\Http\Controllers\Admin\CategoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,6 +22,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Rute CRUD Kategori
     Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class)->except(['create', 'show', 'edit']);
     Route::get('/admin/transactions', [App\Http\Controllers\ReportController::class, 'adminIndex'])->name('admin.reports.index');
+    Route::get('/admin/organizers', [CategoryController::class, 'organizerIndex'])->name('admin.organizers.index');
+    Route::post('/admin/organizers', [CategoryController::class, 'organizerStore'])->name('admin.organizers.store');
 });
 
 // 3. Group Route KHUSUS ORGANIZER

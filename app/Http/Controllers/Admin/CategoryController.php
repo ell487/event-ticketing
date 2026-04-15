@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class CategoryController extends Controller
 {
@@ -53,7 +55,7 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
 
-        
+
         if($category->events()->count() > 0) {
             return back()->with('error', 'Gagal dihapus! Kategori ini sedang digunakan oleh event.');
         }
@@ -61,4 +63,35 @@ class CategoryController extends Controller
         $category->delete();
         return back()->with('success', 'Kategori berhasil dihapus!');
     }
+
+    // Fitur Kelola Organizer
+
+    // 1. Menampilkan daftar organizer
+    public function organizerIndex()
+    {
+        // Mengambil user yang punya role 'organizer'
+        $organizers = User::where('role', 'organizer')->latest()->get();
+        return view('pages.admin.organizers.index', compact('organizers'));
+    }
+
+    // 2. Menyimpan Organizer baru
+    public function organizerStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // Password di-hash biar aman
+            'role' => 'organizer', // Langsung set sebagai organizer
+        ]);
+
+        return back()->with('success', 'Akun Organizer berhasil ditambahkan!');
+    }
 }
+
+

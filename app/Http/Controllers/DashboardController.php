@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Event;
 use App\Models\Transaction;
-use App\Models\User; // Pastikan Model User dipanggil untuk ngitung jumlah organizer
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TicketPaidMail;
 
 class DashboardController extends Controller
 {
@@ -109,10 +111,10 @@ $totalRevenue = Transaction::where('transaction_status', 'paid')
         return view('pages.organizer.events.index', compact('events'));
     }
 
-    // FUNGSI ACC PEMBAYARAN ORGANIZER
-   public function approveTransaction($id)
+ // FUNGSI ACC PEMBAYARAN ORGANIZER
+    public function approveTransaction($id)
     {
-        $transaction = Transaction::with('details')->findOrFail($id);
+        $transaction = Transaction::with(['details', 'user', 'event'])->findOrFail($id);
 
         if ($transaction->event->organizer_id !== Auth::id()) {
             abort(403, 'Anda tidak berhak mengubah transaksi ini.');
@@ -123,13 +125,11 @@ $totalRevenue = Transaction::where('transaction_status', 'paid')
             // 1. Ubah status jadi Lunas ('paid')
             $transaction->update(['transaction_status' => 'paid']);
 
-            // 2. POTONG KUOTA & CETAK TIKET (Pindahan dari PaymentController)
+            // 2. POTONG KUOTA & CETAK TIKET
             foreach ($transaction->details as $detail) {
-                // Kurangi kuota
                 $ticketType = TicketType::find($detail->ticket_type_id);
                 $ticketType->increment('sold_quantity', $detail->quantity);
 
-                // Cetak E-Ticket
                 for ($i = 0; $i < $detail->quantity; $i++) {
                     $ticketCode = 'TIX-' . strtoupper(Str::random(8));
                     $qrCodeFileName = 'qrcodes/' . $ticketCode . '.svg';
@@ -145,7 +145,11 @@ $totalRevenue = Transaction::where('transaction_status', 'paid')
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Pembayaran di-ACC! E-Ticket untuk pembeli telah diterbitkan.');
+
+            // 3. KIRIM EMAIL KE PEMBELI (Ini fitur barunya!)
+            Mail::to($transaction->user->email)->send(new TicketPaidMail($transaction));
+
+            return redirect()->back()->with('success', 'Pembayaran di-ACC! E-Ticket dan Email Notifikasi telah dikirim ke pembeli.');
 
         } catch (\Exception $e) {
             DB::rollBack();
