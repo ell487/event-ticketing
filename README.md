@@ -1,59 +1,265 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎫 TIXEVENT - Event Ticketing Platform with Smart Queue System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-11.x%20%2F%2012.x-red?style=for-the-badge\&logo=laravel)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v3.x-blue?style=for-the-badge\&logo=tailwind-css)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-orange?style=for-the-badge\&logo=mysql)
 
-## About Laravel
+TIXEVENT adalah platform manajemen dan penjualan tiket acara (*event ticketing platform*) berbasis web yang dirancang untuk mengoptimalkan proses transaksi antara Admin, Event Organizer, dan Pengguna. Fitur unggulan dari platform ini adalah **Smart Waiting List & Queue Automation System**, yang membantu mengatasi masalah kehabisan tiket pada event dengan tingkat permintaan tinggi melalui sistem antrean otomatis yang adil dan terstruktur.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# 📌 Project Overview
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem ini menyediakan manajemen tiket secara end-to-end yang mencakup:
 
-## Learning Laravel
+### 1. Multi-Role Access Management
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Memisahkan hak akses berdasarkan peran pengguna:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* **Admin** → Mengelola event, kategori, dan data pengguna.
+* **Organizer** → Mengelola tiket, kuota, dan waiting list.
+* **User** → Membeli tiket dan bergabung ke daftar tunggu.
 
-## Laravel Sponsors
+### 2. Dynamic Ticket Quota Control
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Organizer dapat menambah kuota tiket kapan saja apabila kapasitas acara ditingkatkan.
 
-### Premium Partners
+### 3. FIFO Queue System
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Menggunakan prinsip **First In First Out (FIFO)** untuk menjaga keadilan antrean ketika tiket habis terjual.
 
-## Contributing
+### 4. Automated Email Notification
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Sistem mengirimkan email otomatis menggunakan Mailtrap kepada pengguna yang berada di urutan teratas waiting list ketika tiket tersedia kembali.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# ⚙️ Technologies Used
 
-## Security Vulnerabilities
+| Technology            | Description                |
+| --------------------- | -------------------------- |
+| Laravel               | Backend Framework          |
+| PHP                   | Programming Language       |
+| MySQL                 | Database Management System |
+| Tailwind CSS          | Frontend Styling           |
+| Mailtrap              | Email Testing Service      |
+| Blade Template Engine | Laravel View Engine        |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+# 🚀 Installation & Local Setup
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/USERNAME/TIXEVENT.git
+cd TIXEVENT
+```
+
+## 2. Install Dependencies
+
+```bash
+composer install
+npm install
+npm run dev
+```
+
+## 3. Configure Environment File
+
+Salin file `.env.example` menjadi `.env`
+
+```bash
+cp .env.example .env
+```
+
+Kemudian sesuaikan konfigurasi database dan Mailtrap pada file `.env`.
+
+### Database Configuration
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tixevent_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### Mailtrap Configuration
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=YOUR_MAILTRAP_USERNAME
+MAIL_PASSWORD=YOUR_MAILTRAP_PASSWORD
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=noreply@tixevent.com
+MAIL_FROM_NAME="TIXEVENT"
+```
+
+Generate application key:
+
+```bash
+php artisan key:generate
+```
+
+---
+
+## 4. Database Migration & Seeding
+
+Buat database bernama:
+
+```sql
+tixevent_db
+```
+
+Kemudian jalankan:
+
+```bash
+php artisan migrate --seed
+```
+
+---
+
+## 5. Run Application
+
+```bash
+php artisan config:clear
+php artisan serve
+```
+
+Aplikasi dapat diakses melalui:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+# 🔍 Main Features
+
+## Event Management
+
+* Membuat event baru
+* Mengubah data event
+* Menghapus event
+* Menampilkan detail event
+
+## Ticket Management
+
+* Menambah jenis tiket
+* Mengatur harga tiket
+* Mengatur kuota tiket
+* Memantau tiket terjual
+
+## Waiting List System
+
+* User dapat bergabung ke waiting list ketika tiket habis.
+* Sistem menyimpan urutan antrean secara otomatis.
+* Organizer dapat memanggil pengguna teratas ketika kuota tersedia.
+
+## Email Notification
+
+* Mengirim email otomatis kepada pengguna yang dipanggil.
+* Berisi informasi event dan link pembelian tiket.
+
+---
+
+# 🧠 Smart Queue Workflow
+
+```text
+Tiket Sold Out (Quota = 0)
+            │
+            ▼
+User Klik "Masuk Daftar Tunggu"
+            │
+            ▼
+Data Disimpan ke waiting_lists
+(Status = waiting)
+            │
+            ▼
+Organizer Menambah Kuota Tiket
+            │
+            ▼
+Organizer Klik "Panggil"
+            │
+            ▼
+Sistem Mengirim Email Notifikasi
+(Status = notified)
+            │
+            ▼
+User Membeli Tiket
+            │
+            ▼
+Status Menjadi "done"
+```
+
+---
+
+# 💾 Database Schema Overview
+
+## users
+
+Menyimpan data akun dan hak akses pengguna.
+
+| Field    | Type                         |
+| -------- | ---------------------------- |
+| id       | bigint                       |
+| name     | varchar                      |
+| email    | varchar                      |
+| password | varchar                      |
+| role     | enum(admin, organizer, user) |
+
+---
+
+## events
+
+Menyimpan informasi acara.
+
+| Field       | Type     |
+| ----------- | -------- |
+| id          | bigint   |
+| title       | varchar  |
+| description | text     |
+| location    | varchar  |
+| event_date  | datetime |
+| banner      | varchar  |
+
+---
+
+## ticket_types
+
+Menyimpan data jenis tiket.
+
+| Field         | Type    |
+| ------------- | ------- |
+| id            | bigint  |
+| event_id      | bigint  |
+| name          | varchar |
+| price         | decimal |
+| quota         | integer |
+| sold_quantity | integer |
+
+---
+
+## waiting_lists
+
+Menyimpan data antrean pengguna.
+
+| Field      | Type                          |
+| ---------- | ----------------------------- |
+| id         | bigint                        |
+| user_id    | bigint                        |
+| event_id   | bigint                        |
+| status     | enum(waiting, notified, done) |
+| created_at | timestamp                     |
+
+---
+
+# 🎯 Results and Conclusion
+
+TIXEVENT berhasil mengimplementasikan sistem penjualan tiket yang terintegrasi dengan fitur waiting list otomatis untuk menangani kondisi tiket habis (*sold out*).
+
+Melalui penerapan sistem antrean FIFO dan notifikasi email otomatis, proses distribusi tiket menjadi lebih transparan, adil, dan efisien. Selain itu, organizer memiliki fleksibilitas untuk menambah kuota tiket tanpa mengganggu integritas data maupun urutan antrean pengguna.
+
